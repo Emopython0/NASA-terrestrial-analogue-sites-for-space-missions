@@ -163,11 +163,11 @@
           </span>
           <span id="mission-coords" class="font-mono text-xs text-muted">31.15° N, 5.75° W · ANTI-ATLAS, MOROCCO</span>
         </div>
-        <h2 id="mission-headline" class="font-serif text-2xl sm:text-3xl font-bold text-ink">
+          <h2 id="mission-headline" class="font-serif text-2xl sm:text-3xl font-bold text-ink">
           Jebel Saghro: Earth's Equatorial Mars Twin
         </h2>
-        <p id="mission-summary" class="text-sm sm:text-base text-muted leading-relaxed">
-          Rehearsing Mars missions in Morocco: equatorial daytime heat (19–22°C), hard high-thermal-inertia bedrock, high UV, and biosignature minerals.
+        <p id="mission-summary" class="text-sm text-muted">
+          Equatorial daytime heat (19–22°C), hard bedrock, high UV, and biosignature minerals.
         </p>
       </div>
 
@@ -187,7 +187,7 @@
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span class="font-mono text-xs font-semibold text-ink uppercase tracking-wide">Interactive Surface Cross-Section</span>
-            <span class="hidden sm:inline font-mono text-[11px] text-muted">(Drag to pan · Scroll/Buttons to zoom · Click pins)</span>
+            <span class="hidden sm:inline font-mono text-[11px] text-muted">(Drag · Zoom · Click pins)</span>
           </div>
 
           <!-- View & Zoom Controls -->
@@ -296,51 +296,6 @@
       </div>
     </div>
 
-    <!-- Bottom Benchmark Comparison Matrix (Existing Analogs vs Our Selections) -->
-    <section class="bg-white rounded-2xl border border-stoneBorder p-5 sm:p-6 shadow-xs">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <div>
-          <span class="font-mono text-[11px] font-semibold uppercase tracking-widest text-muted">GLOBAL TESTBED CONTEXT</span>
-          <h3 class="font-serif text-xl font-bold text-ink">Existing NASA Analogs vs. Our Candidates</h3>
-        </div>
-        <span class="font-mono text-xs text-muted">Click a candidate to switch</span>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-        <div class="p-4 rounded-xl bg-stone-50 border border-stoneBorder">
-          <div class="font-mono text-[10px] text-muted uppercase">IDAHO, USA</div>
-          <div class="font-bold text-sm text-ink mt-0.5">Craters of the Moon</div>
-          <p class="text-xs text-muted mt-1 leading-snug">Volcanic lava tubes modeling Martian caves.</p>
-        </div>
-        <div class="p-4 rounded-xl bg-stone-50 border border-stoneBorder">
-          <div class="font-mono text-[10px] text-muted uppercase">CANADIAN ARCTIC</div>
-          <div class="font-bold text-sm text-ink mt-0.5">Devon Island</div>
-          <p class="text-xs text-muted mt-1 leading-snug">Polar rocky terrain for rover &amp; crew drills.</p>
-        </div>
-        <div class="p-4 rounded-xl bg-stone-50 border border-stoneBorder">
-          <div class="font-mono text-[10px] text-muted uppercase">CHILE</div>
-          <div class="font-bold text-sm text-ink mt-0.5">Atacama Desert</div>
-          <p class="text-xs text-muted mt-1 leading-snug">Hyper-arid soil and intense Martian UV.</p>
-        </div>
-        <div onclick="switchMission('mars')" class="cursor-pointer p-4 rounded-xl bg-marsSoft border-2 border-mars/40 hover:border-mars transition">
-          <div class="flex items-center justify-between">
-            <span class="font-mono text-[10px] font-bold text-mars uppercase">OUR MARS PICK</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-mars"></i>
-          </div>
-          <div class="font-bold text-sm text-ink mt-0.5">Jebel Saghro, Morocco</div>
-          <p class="text-xs text-ink/80 mt-1 leading-snug">20°C equatorial match, biosignature rocks, hard bedrock.</p>
-        </div>
-        <div onclick="switchMission('moon')" class="cursor-pointer p-4 rounded-xl bg-lunarSoft border-2 border-lunar/40 hover:border-lunar transition">
-          <div class="flex items-center justify-between">
-            <span class="font-mono text-[10px] font-bold text-lunar uppercase">OUR MOON PICK</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-lunar"></i>
-          </div>
-          <div class="font-bold text-sm text-ink mt-0.5">Anabar Plateau, Siberia</div>
-          <p class="text-xs text-ink/80 mt-1 leading-snug">Lunar-like anorthosite crust &amp; Popigai crater.</p>
-        </div>
-      </div>
-    </section>
-
   </main>
 
   <!-- Footer -->
@@ -365,8 +320,7 @@
       </div>
       <ol class="space-y-3 text-sm text-muted list-decimal list-inside">
         <li>Create a new public repository on <strong class="text-ink">GitHub.com</strong> (e.g., <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-xs text-ink">nasa-planetary-analogs</code>).</li>
-      <ol class="space-y-2.5 text-sm text-muted list-decimal list-inside">
-        <li>Create a public repo on <strong class="text-ink">GitHub.com</strong> and upload this file as <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-xs text-ink">index.html</code>.</li>
+        <li>Upload this file as <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-xs text-ink">index.html</code>.</li>
         <li>Open <strong class="text-ink">Settings → Pages</strong>, pick the <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-xs text-ink">main</code> branch, and click <strong class="text-ink">Save</strong>.</li>
         <li>Share your live GitHub Pages URL directly with the judges!</li>
       </ol>
@@ -391,30 +345,16 @@
         badge: 'MARS TERRESTRIAL ANALOG',
         coords: '31.15° N, 5.75° W · ANTI-ATLAS, MOROCCO',
         headline: "Jebel Saghro: Earth's Equatorial Mars Twin",
-        summary: "Rehearsing Mars missions in Morocco: equatorial daytime heat (19–22°C), hard high-thermal-inertia bedrock, high UV, and biosignature minerals.",
+        summary: "Equatorial daytime heat (19–22°C), hard bedrock, high UV, and biosignature minerals.",
         kpis: [
           { label: 'EQUATOR DAY TEMP', value: '19–22°C', sub: 'vs Mars ~20°C' },
           { label: 'BIOSIGNATURE ROCKS', value: '3 Types', sub: 'Silica · Clays · Carbonates' },
           { label: 'THERMAL INERTIA', value: 'High', sub: 'Hard Rock + Thin Dust' }
         ],
-        legend: [
-          { color: '#C85A32', label: 'Basalt Peaks' },
-          { color: '#E09F5A', label: 'Thin Dust (<2 cm)' },
-          { color: '#3B82F6', label: 'Silica / Clay / Carbonate' },
-          { color: '#9A3412', label: 'Mars Crater Rim' }
-        ],
-        hotspots: [
-          {
-            id: 'temp',
-            shortTitle: 'Equatorial Temp',
-            icon: 'fa-temperature-half',
-            pinX: 250,
-            pinY: 165,
-            title: 'Equatorial Temperature Match',
-            tag: 'THERMAL ENVIRONMENT',
+// ... existing code ... -->
             analogStat: '19–22°C Day · 11–14°C Night',
             targetStat: 'Mars Equator: 20°C Day · -73°C Night',
-            description: 'Mars averages -60°C globally (-153°C at poles), but summer days at the equatorial landing zone reach 20°C—matching Jebel Saghro’s daytime highs safely for crew trials.',
+            description: 'Summer daytime highs at Mars’s equator reach 20°C, matching Jebel Saghro (19–22°C) for safe crew trials.',
             table: [
               { zone: 'Equator Summer Day', planet: 'Up to 20°C', earth: '19–22°C (Match)' },
               { zone: 'Equator Night', planet: '-73°C', earth: '11–14°C' },
@@ -431,7 +371,7 @@
             tag: 'ASTROBIOLOGY',
             analogStat: 'Abundant Silica, Clays & Carbonates',
             targetStat: 'Preserves Ancient Life Traces on Mars',
-            description: 'Silica, clays, and carbonates trap and shield ancient microbial traces from destruction—making Jebel Saghro ideal for calibrating Mars life-detection sensors.',
+            description: 'Silica, clays, and carbonates trap ancient microbial traces, making Jebel Saghro ideal for testing life-detection sensors.',
             table: [
               { zone: 'Silica', planet: 'Entombs microfossils', earth: 'Abundant in veins' },
               { zone: 'Clays', planet: 'Binds organic molecules', earth: 'Weathered volcanic beds' },
@@ -448,7 +388,7 @@
             tag: 'LANDING & ORBITAL SENSING',
             analogStat: 'Hard Bedrock + Thin Dust Veneer',
             targetStat: 'Mirrors Cratered Martian Regolith',
-            description: 'Unlike the Sahara’s deep loose sand, Jebel Saghro has hard rocky terrain with thin dust—ideal for safe landing trials and clear orbital mineral detection.',
+            description: 'Unlike the Sahara’s deep loose sand, hard bedrock with thin dust supports landing simulations and clear orbital rock detection.',
             table: [
               { zone: 'Surface', planet: 'Hard rocky cratered crust', earth: 'Exposed basalt bedrock' },
               { zone: 'Dust Layer', planet: 'Thin regolith veneer', earth: 'Thin dust (<2 cm)' },
@@ -465,7 +405,7 @@
             tag: 'RADIATION & ATMOSPHERE',
             analogStat: 'Intense Arid UV + Lower Peak O₂',
             targetStat: 'Mars Thin Atmosphere (~1% Earth)',
-            description: 'While Earth blocks cosmic ionizing rays, Jebel Saghro’s arid peaks deliver intense UV exposure plus naturally dropping oxygen levels at higher altitudes.',
+            description: 'High elevation and arid skies deliver intense UV exposure alongside naturally lower oxygen levels.',
             table: [
               { zone: 'Radiation', planet: 'Cosmic + Extreme UV', earth: 'High-intensity UV light' },
               { zone: 'Oxygen / Air', planet: 'Thin, near-zero O₂', earth: 'Decreases with altitude' },
@@ -482,30 +422,16 @@
         badge: 'LUNAR TERRESTRIAL ANALOG',
         coords: '70.50° N, 108.00° E · SIBERIAN ARCTIC / POPIGAI',
         headline: "Anabar Plateau: Earth's Lunar Highlands Twin",
-        summary: "Rehearsing Moon landings in Siberia: ancient lunar-like anorthosite crust, the 100-km Popigai impact crater, extreme cold, and 1/6g mobility drills.",
+        summary: "Ancient lunar-like anorthosite crust, 100-km Popigai impact crater, extreme cold, and 1/6g drills.",
         kpis: [
           { label: 'CRUSTAL ROCK', value: 'Anorthosite', sub: 'Apollo Highlands Twin' },
           { label: 'IMPACT BASIN', value: '100 km', sub: 'Popigai Crater Rim' },
           { label: 'LUNAR GRAVITY', value: '1/6 g', sub: '16.6% Earth Pull' }
         ],
-        legend: [
-          { color: '#64748B', label: 'Anorthosite Crust' },
-          { color: '#38BDF8', label: 'Arctic Permafrost' },
-          { color: '#6366F1', label: 'Popigai Impact Melt' },
-          { color: '#CBD5E1', label: 'Lunar Crater Rim' }
-        ],
-        hotspots: [
-          {
-            id: 'anorthosite',
-            shortTitle: 'Anorthosite Crust',
-            icon: 'fa-mountain',
-            pinX: 260,
-            pinY: 185,
-            title: 'Lunar Highlands Anorthosite Crust',
-            tag: 'CRUSTAL GEOLOGY',
+// ... existing code ... -->
             analogStat: 'Exposed Archean Anorthosite Shield',
             targetStat: 'Matches Bright Lunar Highlands',
-            description: 'The bright lunar highlands are built of calcium-rich anorthosite. The Anabar Plateau exposes vast ancient anorthosite rock for astronaut sampling practice.',
+            description: 'Anabar exposes vast calcium-rich anorthosite—the exact rock type sampled in the bright lunar highlands.',
             table: [
               { zone: 'Rock Type', planet: 'Lunar Highland Anorthosite', earth: 'Anabar Anorthosite' },
               { zone: 'Crust Age', planet: '>4.1 Billion Years', earth: 'Archean Shield' },
@@ -522,7 +448,7 @@
             tag: 'IMPACT GEOLOGY',
             analogStat: '100-km Crater & Shocked Breccia',
             targetStat: 'Mirrors Lunar Basin Excavation',
-            description: 'Right beside Anabar lies the 100-km Popigai impact structure, letting rovers and crews traverse real impact melt sheets and steep crater rims.',
+            description: 'The adjacent 100-km Popigai crater provides real shock-melted rock and steep crater rims for rover traverses.',
             table: [
               { zone: 'Crater Scale', planet: 'Multi-ring lunar basins', earth: '100 km Popigai Crater' },
               { zone: 'Shock Rock', planet: 'Impact melt & breccia', earth: 'Shock-melted gneiss' },
@@ -539,7 +465,7 @@
             tag: 'LUNAR SURFACE HAZARDS',
             analogStat: 'Suit Seal, Mobility & Shelter Drills',
             targetStat: '1/6g · Abrasive Dust · Solar Storms',
-            description: 'Astronauts rehearse for four core lunar hazards: sharp abrasive dust, extreme temperature swings, unshielded solar storms, and 1/6 Earth gravity.',
+            description: 'Rehearses mobility and hardware resilience against sharp lunar dust, extreme temperatures, solar storms, and 1/6g.',
             table: [
               { zone: 'Gravity', planet: '1/6 Earth Gravity', earth: 'Offloaded suit mobility' },
               { zone: 'Lunar Dust', planet: 'Sharp glass-like regolith', earth: 'Abrasive dust seal tests' },
@@ -556,7 +482,7 @@
             tag: 'ARTEMIS READINESS',
             analogStat: 'Siberian Permafrost & Isolation',
             targetStat: 'Lunar South Pole Shadow Zones',
-            description: 'Anabar’s sub-zero Siberian permafrost mirrors the Moon’s shadowed South Pole craters—testing battery life, ice drills, and remote crew isolation.',
+            description: 'Sub-zero Arctic permafrost mirrors shadowed lunar South Pole craters for ice drilling and remote crew operations.',
             table: [
               { zone: 'Extreme Cold', planet: 'Cryogenic shadowed craters', earth: 'Sub-zero Arctic winter' },
               { zone: 'Water Ice', planet: 'Regolith-trapped ice', earth: 'Permafrost core drilling' },
