@@ -1,321 +1,1202 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planetary Analog Matcher | NASA Space Apps Challenge</title>
-    <!-- Chart.js loaded directly from CDN so GitHub Pages runs it instantly without installations -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --bg-dark: #090d16;
-            --card-bg: #111827;
-            --border-color: #1f2937;
-            --cyan: #00f2fe;
-            --amber: #f59e0b;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terrestrial Analogs Explorer | Mars &amp; Moon Mission Prep</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fraunces (Editorial), Plus Jakarta Sans (UI), IBM Plex Mono (Telemetry) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Fraunces', 'serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            stoneBg: '#FAF8F5',
+            stoneCard: '#FFFFFF',
+            stoneBorder: '#E7E1D8',
+            ink: '#1C1917',
+            muted: '#575049',
+            mars: '#D9532F',
+            marsSoft: '#FDF1ED',
+            ochre: '#D97706',
+            lunar: '#2563EB',
+            lunarSoft: '#EFF6FF',
+          }
         }
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            margin: 0;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .header {
-            text-align: center;
-            max-width: 850px;
-            margin-bottom: 28px;
-        }
-        .header h1 {
-            margin: 0 0 8px 0;
-            font-size: 2rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, var(--cyan), #ffffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .header p {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 1rem;
-        }
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 24px;
-            max-width: 1000px;
-            width: 100%;
-        }
-        @media (max-width: 768px) {
-            .dashboard { grid-template-columns: 1fr; }
-        }
-        .panel {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-        }
-        .control-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-        select {
-            width: 100%;
-            padding: 12px;
-            background-color: #1f2937;
-            color: white;
-            border: 1px solid #374151;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            cursor: pointer;
-        }
-        select:focus {
-            outline: none;
-            border-color: var(--cyan);
-        }
-        .score-box {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.08), rgba(245, 158, 11, 0.08));
-            border: 1px solid rgba(0, 242, 254, 0.25);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            margin-top: 24px;
-        }
-        .score-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-        }
-        .score-value {
-            font-size: 3.2rem;
-            font-weight: 800;
-            color: var(--cyan);
-            margin: 4px 0;
-        }
-        .mission-note {
-            font-size: 0.9rem;
-            color: #d1d5db;
-            line-height: 1.5;
-            margin-top: 18px;
-            padding-top: 18px;
-            border-top: 1px solid var(--border-color);
-        }
-        .chart-container {
-            position: relative;
-            height: 400px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
+      }
+    };
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #FAF8F5;
+      color: #1C1917;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Interactive Diagram Viewport */
+    #diagram-viewport {
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      background-image: radial-gradient(#D6CFC5 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    #diagram-viewport:active {
+      cursor: grabbing;
+    }
+
+    /* Pulsing Hotspot Pins */
+    @keyframes pulseRing {
+      0% { transform: scale(0.95); opacity: 0.85; }
+      70% { transform: scale(1.85); opacity: 0; }
+      100% { transform: scale(1.85); opacity: 0; }
+    }
+    .hotspot-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: pulseRing 2.2s infinite ease-out;
+    }
+    .hotspot-group {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .hotspot-group:hover {
+      filter: brightness(1.08);
+    }
+
+    /* Smooth transitions */
+    .tab-pill {
+      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Custom range slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #1C1917;
+      cursor: pointer;
+      margin-top: -6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: #E7E1D8;
+      border-radius: 999px;
+    }
+  </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-    <div class="header">
-        <h1>Planetary Analog Matcher</h1>
-        <p>Quantitative Terrain, Mineral & Thermal Comparison: Earth Testbeds vs. Lunar Targets</p>
+  <!-- Top Mission Header -->
+  <header class="sticky top-0 z-30 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-stoneBorder">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand / Hackathon Badge -->
+      <div class="flex items-center gap-3">
+        <div id="brand-icon" class="w-10 h-10 rounded-xl bg-mars text-white flex items-center justify-center shadow-sm transition-colors duration-300">
+          <i class="fa-solid fa-satellite-dish text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-[11px] font-semibold uppercase tracking-widest text-mars" id="header-kicker">NASA SPACE APPS CHALLENGE</span>
+            <span class="hidden sm:inline-block px-2 py-0.5 rounded-full bg-stone-200/70 font-mono text-[10px] text-muted">ANALOG TWIN v2.4</span>
+          </div>
+          <h1 class="font-serif text-lg sm:text-xl font-bold text-ink leading-tight">Planetary Terrestrial Analog Explorer</h1>
+        </div>
+      </div>
+
+      <!-- Mission Switcher Controls -->
+      <div class="flex items-center gap-2 bg-stone-200/75 p-1.5 rounded-2xl border border-stoneBorder">
+        <button onclick="switchMission('mars')" id="btn-mission-mars"
+          class="tab-pill px-3.5 py-2 rounded-xl font-mono text-xs font-semibold flex items-center gap-2 bg-mars text-white shadow-sm">
+          <i class="fa-solid fa-planet-ringed"></i>
+          <span>01: MARS ↔ JEBEL SAGHRO</span>
+        </button>
+        <button onclick="switchMission('moon')" id="btn-mission-moon"
+          class="tab-pill px-3.5 py-2 rounded-xl font-mono text-xs font-semibold flex items-center gap-2 text-muted hover:text-ink">
+          <i class="fa-solid fa-moon"></i>
+          <span>02: MOON ↔ ANABAR PLATEAU</span>
+        </button>
+      </div>
+
+      <!-- GitHub Pages Deploy Helper Button -->
+      <button onclick="toggleModal('github-modal', true)"
+        class="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 border border-stoneBorder text-ink font-mono text-xs font-semibold flex items-center gap-2 shadow-xs transition">
+        <i class="fa-brands fa-github text-sm"></i>
+        <span class="hidden md:inline">GitHub Host Guide</span>
+      </button>
     </div>
+  </header>
 
-    <div class="dashboard">
-        <!-- Control Panel: Easily editable for your research -->
-        <div class="panel">
-            <div class="control-group">
-                <label for="earthSelect" style="color: #00f2fe;">1. Select Earth Analog Site</label>
-                <select id="earthSelect" onchange="updateComparison()"></select>
-            </div>
+  <!-- Main Workspace -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-            <div class="control-group">
-                <label for="moonSelect" style="color: #f59e0b;">2. Select Lunar Target Location</label>
-                <select id="moonSelect" onchange="updateComparison()"></select>
-            </div>
+    <!-- Mission Banner & Quick Telemetry Strip -->
+    <section class="bg-white rounded-2xl border border-stoneBorder p-5 sm:p-6 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+      <div class="space-y-1.5 max-w-2xl">
+        <div class="flex items-center gap-2">
+          <span id="mission-badge" class="px-2.5 py-0.5 rounded-md font-mono text-xs font-semibold bg-marsSoft text-mars">
+            TERRESTRIAL ANALOG CANDIDATE
+          </span>
+          <span id="mission-coords" class="font-mono text-xs text-muted">31.15° N, 5.75° W · ANTI-ATLAS, MOROCCO</span>
+        </div>
+        <h2 id="mission-headline" class="font-serif text-2xl sm:text-3xl font-bold text-ink">
+          Jebel Saghro: Earth's Equatorial Mars Twin
+        </h2>
+        <p id="mission-summary" class="text-sm sm:text-base text-muted leading-relaxed">
+          Astronauts and rovers rehearse on Earth before launching. Jebel Saghro mirrors Martian equatorial daytime temperatures, exposed rocky thermal inertia, intense UV flux, and biosignature-trapping minerals.
+        </p>
+      </div>
 
-            <div class="score-box">
-                <div class="score-label">Geological & Terrain Similarity</div>
-                <div class="score-value" id="similarityScore">--%</div>
-                <div style="font-size: 0.75rem; color: #9ca3af;">Normalized Euclidean Vector Algorithm</div>
-            </div>
+      <!-- 3 Quick Telemetry KPIs -->
+      <div id="kpi-strip" class="grid grid-cols-3 gap-3 shrink-0">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </section>
 
-            <div class="mission-note" id="missionInsight"></div>
+    <!-- Core Interactive Split Grid: Terrain Canvas (Left) + Scientific Inspector (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- LEFT COLUMN (7 Cols): Interactive Cartoonic-Scientific Cross-Section & Terrain Explorer -->
+      <div class="lg:col-span-7 bg-white rounded-2xl border border-stoneBorder shadow-xs overflow-hidden flex flex-col">
+        <!-- Canvas Toolbar -->
+        <div class="px-4 py-3 bg-stone-50 border-b border-stoneBorder flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="font-mono text-xs font-semibold text-ink uppercase tracking-wide">Interactive Surface Cross-Section</span>
+            <span class="hidden sm:inline font-mono text-[11px] text-muted">(Drag to pan · Scroll/Buttons to zoom · Click pins)</span>
+          </div>
+
+          <!-- View & Zoom Controls -->
+          <div class="flex items-center gap-1.5">
+            <button onclick="toggleSplitView()" id="btn-split-toggle"
+              class="px-2.5 py-1.5 rounded-lg bg-white border border-stoneBorder hover:bg-stone-100 font-mono text-xs font-medium text-ink flex items-center gap-1.5 transition"
+              title="Toggle Twin Comparison Overlay">
+              <i class="fa-solid fa-layer-group text-mars" id="split-icon"></i>
+              <span id="split-label">Planet Twin Overlay: ON</span>
+            </button>
+            <button onclick="adjustZoom(0.18)" class="w-8 h-8 rounded-lg bg-white border border-stoneBorder hover:bg-stone-100 flex items-center justify-center text-ink" title="Zoom In">
+              <i class="fa-solid fa-plus text-xs"></i>
+            </button>
+            <button onclick="adjustZoom(-0.18)" class="w-8 h-8 rounded-lg bg-white border border-stoneBorder hover:bg-stone-100 flex items-center justify-center text-ink" title="Zoom Out">
+              <i class="fa-solid fa-minus text-xs"></i>
+            </button>
+            <button onclick="resetView()" class="px-2.5 h-8 rounded-lg bg-white border border-stoneBorder hover:bg-stone-100 font-mono text-xs font-medium text-muted hover:text-ink" title="Reset Camera">
+              Reset
+            </button>
+          </div>
         </div>
 
-        <!-- Radar Chart Panel -->
-        <div class="panel">
-            <div class="chart-container">
-                <canvas id="radarChart"></canvas>
+        <!-- Interactive SVG Viewport -->
+        <div id="diagram-viewport" class="relative w-full h-[430px] sm:h-[470px] overflow-hidden bg-[#F5F1EB]">
+          <!-- Pan/Zoom Transform Container -->
+          <div id="pan-zoom-layer" class="w-full h-full origin-center transition-transform duration-75 ease-out">
+            <!-- SVG injected dynamically per mission -->
+          </div>
+
+          <!-- Floating Legend Pill (Bottom Left) -->
+          <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-xs border border-stoneBorder rounded-xl px-3 py-2 shadow-sm pointer-events-none">
+            <div class="font-mono text-[10px] font-semibold text-muted uppercase mb-1">Geological Layers</div>
+            <div id="diagram-legend" class="flex flex-wrap items-center gap-3 text-xs font-medium text-ink">
+              <!-- Populated by JS -->
             </div>
+          </div>
+
+          <!-- Floating Rover / Spectrometer Position Readout (Bottom Right) -->
+          <div class="absolute bottom-3 right-3 bg-ink/90 text-white rounded-xl px-3 py-2 font-mono text-[11px] shadow-sm pointer-events-none">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-crosshairs text-amber-400"></i>
+              <span id="telemetry-readout">ROVER SCAN: SECTOR A · BEDROCK</span>
+            </div>
+          </div>
         </div>
+
+        <!-- Interactive Rover & Orbital Spectrometer Simulator Bar -->
+        <div class="p-4 bg-stone-50 border-t border-stoneBorder space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-robot text-ink"></i>
+              <span class="font-mono text-xs font-semibold uppercase text-ink">Interactive Rover &amp; Orbital Spectrometer Traverse</span>
+            </div>
+            <span id="rover-zone-badge" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+              SAFE LANDING ZONE · HIGH THERMAL INERTIA
+            </span>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <span class="font-mono text-xs text-muted shrink-0">0 km</span>
+            <input type="range" id="rover-slider" min="5" max="95" value="32" oninput="updateRoverPosition(this.value)" class="w-full" />
+            <span class="font-mono text-xs text-muted shrink-0">10 km</span>
+          </div>
+
+          <!-- Live Spectrometer Output Box -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+            <div class="bg-white p-2.5 rounded-xl border border-stoneBorder">
+              <div class="font-mono text-[10px] text-muted uppercase">Detected Mineralogy</div>
+              <div id="spec-mineral" class="text-xs font-bold text-ink mt-0.5">Silica + Smectite Clays</div>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-stoneBorder">
+              <div class="font-mono text-[10px] text-muted uppercase">Surface &amp; Thermal Inertia</div>
+              <div id="spec-surface" class="text-xs font-bold text-ink mt-0.5">Hard Basalt · Thin Dust (&lt;2cm)</div>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-stoneBorder">
+              <div class="font-mono text-[10px] text-muted uppercase">Mission Simulation Status</div>
+              <div id="spec-status" class="text-xs font-bold text-emerald-700 mt-0.5">Optimal Rover Traction &amp; Scan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN (5 Cols): Hotspot Scientific Detail & Interactive Simulators -->
+      <div class="lg:col-span-5 space-y-5">
+
+        <!-- Hotspot Selector Pills -->
+        <div class="bg-white rounded-2xl border border-stoneBorder p-4 shadow-xs">
+          <div class="font-mono text-[11px] font-semibold text-muted uppercase tracking-wider mb-2.5">
+            Select Scientific Analog Parameter
+          </div>
+          <div id="hotspot-buttons" class="grid grid-cols-2 gap-2">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Active Hotspot Deep-Dive Card -->
+        <div id="hotspot-detail-card" class="bg-white rounded-2xl border border-stoneBorder p-5 sm:p-6 shadow-xs space-y-4">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Interactive Physics / Environment Sandbox Card -->
+        <div id="sandbox-card" class="bg-white rounded-2xl border border-stoneBorder p-5 shadow-xs space-y-3">
+          <!-- Populated dynamically (e.g., Sahara Loose Sand Toggle / Altitude UV Slider for Mars; 1/6g Jump Simulator for Moon) -->
+        </div>
+
+      </div>
     </div>
 
-    <script>
-        /* 
-          ========================================================================
-          RESEARCH DATA STORAGE 
-          You can easily modify numbers or add new locations here as your research grows!
-          Normalized values ('norm') must be between 0.0 and 1.0 for the chart scale.
-          ========================================================================
-        */
+    <!-- Bottom Benchmark Comparison Matrix (Existing Analogs vs Our Selections) -->
+    <section class="bg-white rounded-2xl border border-stoneBorder p-5 sm:p-6 shadow-xs">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <div>
+          <span class="font-mono text-[11px] font-semibold uppercase tracking-widest text-muted">GLOBAL ANALOG CONTEXT</span>
+          <h3 class="font-serif text-xl font-bold text-ink">How Our Candidates Compare to Existing NASA Testbeds</h3>
+        </div>
+        <span class="font-mono text-xs text-muted">Click any card to inspect</span>
+      </div>
 
-        const earthSites = {
-            "UAE Rub' al Khali (Desert Dunes)": {
-                norm: [0.00, 0.01, 0.00, 0.00, 0.03],
-                note: "Fine wind-blown silica dunes simulate loose lunar regolith mechanics for testing rover wheel traction, sinkage, and dust-mitigation seals."
-            },
-            "Hajar Mountains (Ophiolite / Anorthosite)": {
-                norm: [1.00, 1.00, 0.80, 0.23, 0.01],
-                note: "High plagioclase/anorthosite rock content closely mirrors ancient Lunar Highlands crust, ideal for ISRU oxygen extraction research."
-            },
-            "Harrat Khaybar Volcanic Field (Lava Tubes)": {
-                norm: [0.32, 0.33, 0.04, 1.00, 0.00],
-                note: "Basaltic volcanic fields and subterranean lava tubes replicate lunar sinuous rilles and skylight pits for testing autonomous mapping drones."
-            },
-            "Antarctic Dry Valleys": {
-                norm: [0.45, 0.08, 0.11, 0.41, 0.07],
-                note: "Hyper-arid permafrost and low-angle solar illumination replicate cryogenic South Pole craters for testing ice-mining drills."
-            }
-        };
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+        <div class="p-4 rounded-xl bg-stone-50 border border-stoneBorder">
+          <div class="font-mono text-[10px] text-muted uppercase">IDAHO, USA</div>
+          <div class="font-bold text-sm text-ink mt-0.5">Craters of the Moon</div>
+          <p class="text-xs text-muted mt-1.5 leading-relaxed">Volcanic lava tubes used to model Martian subsurface caves.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-stone-50 border border-stoneBorder">
+          <div class="font-mono text-[10px] text-muted uppercase">CANADIAN ARCTIC</div>
+          <div class="font-bold text-sm text-ink mt-0.5">Devon Island</div>
+          <p class="text-xs text-muted mt-1.5 leading-relaxed">Polar rocky terrain for NASA rover and habitat crew rehearsals.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-stone-50 border border-stoneBorder">
+          <div class="font-mono text-[10px] text-muted uppercase">CHILE</div>
+          <div class="font-bold text-sm text-ink mt-0.5">Atacama Desert</div>
+          <p class="text-xs text-muted mt-1.5 leading-relaxed">Hyper-arid soil and intense UV radiation closely mimicking Mars.</p>
+        </div>
+        <div onclick="switchMission('mars')" class="cursor-pointer p-4 rounded-xl bg-marsSoft border-2 border-mars/40 hover:border-mars transition">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-[10px] font-bold text-mars uppercase">OUR MARS PICK</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-mars"></i>
+          </div>
+          <div class="font-bold text-sm text-ink mt-0.5">Jebel Saghro, Morocco</div>
+          <p class="text-xs text-ink/80 mt-1.5 leading-relaxed">20°C equatorial match, silica/clays/carbonates, high thermal inertia bedrock.</p>
+        </div>
+        <div onclick="switchMission('moon')" class="cursor-pointer p-4 rounded-xl bg-lunarSoft border-2 border-lunar/40 hover:border-lunar transition">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-[10px] font-bold text-lunar uppercase">OUR MOON PICK</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-lunar"></i>
+          </div>
+          <div class="font-bold text-sm text-ink mt-0.5">Anabar Plateau, Siberia</div>
+          <p class="text-xs text-ink/80 mt-1.5 leading-relaxed">Ancient lunar-like anorthosite crust, Popigai impact crater, extreme cold.</p>
+        </div>
+      </div>
+    </section>
 
-        const moonSites = {
-            "Moon: Shackleton Crater (South Pole)": {
-                norm: [0.57, 0.00, 0.90, 0.14, 0.53],
-                note: "Artemis target zone featuring peaks of near-eternal sunlight on the rim and permanently shadowed water-ice traps inside."
-            },
-            "Moon: Marius Hills (Subterranean Pit)": {
-                norm: [0.30, 0.00, 0.26, 0.82, 1.00],
-                note: "Volcanic dome region containing a confirmed skylight pit leading into an intact underground lava tube with stable internal temperatures."
-            },
-            "Moon: Lunar Highlands (Tycho Region)": {
-                norm: [0.87, 0.00, 1.00, 0.07, 0.96],
-                note: "Rugged, heavily cratered terrain composed primarily of bright calcium-rich anorthosite rock."
-            }
-        };
+  </main>
 
-        const features = [
-            "Terrain Slope",
-            "Grain Size",
-            "Anorthosite Mineral %",
-            "Basalt Rock %",
-            "Thermal Swing"
-        ];
+  <!-- Footer -->
+  <footer class="border-t border-stoneBorder bg-white py-4 mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted font-mono">
+      <span>NASA SPACE APPS HACKATHON · TERRESTRIAL ANALOGS PROJECT</span>
+      <span>MARS (JEBEL SAGHRO) &amp; MOON (ANABAR PLATEAU)</span>
+    </div>
+  </footer>
 
-        // Populate HTML Dropdown Menus automatically
-        const earthSelect = document.getElementById("earthSelect");
-        const moonSelect = document.getElementById("moonSelect");
+  <!-- GitHub Pages Deployment Guide Modal -->
+  <div id="github-modal" class="fixed inset-0 z-50 hidden bg-ink/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-stoneBorder max-w-lg w-full p-6 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-stoneBorder pb-3">
+        <div class="flex items-center gap-2.5">
+          <i class="fa-brands fa-github text-xl text-ink"></i>
+          <h3 class="font-serif text-xl font-bold text-ink">Host This Live on GitHub Pages (60 Sec)</h3>
+        </div>
+        <button onclick="toggleModal('github-modal', false)" class="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center text-muted">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <ol class="space-y-3 text-sm text-muted list-decimal list-inside">
+        <li>Create a new public repository on <strong class="text-ink">GitHub.com</strong> (e.g., <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-xs text-ink">nasa-planetary-analogs</code>).</li>
+        <li>Save this single file as <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-xs text-ink">index.html</code> and upload it to your repository.</li>
+        <li>Go to <strong class="text-ink">Settings → Pages</strong> in your repo.</li>
+        <li>Under <strong class="text-ink">Build and deployment → Branch</strong>, select <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-xs text-ink">main</code> and click <strong class="text-ink">Save</strong>.</li>
+        <li>Within 1 minute, GitHub gives you a live public link to share with the NASA hackathon judges!</li>
+      </ol>
+      <div class="pt-2 flex justify-end">
+        <button onclick="toggleModal('github-modal', false)" class="px-4 py-2 rounded-xl bg-ink text-white font-mono text-xs font-semibold hover:bg-stone-800">
+          Got It!
+        </button>
+      </div>
+    </div>
+  </div>
 
-        Object.keys(earthSites).forEach(site => {
-            const opt = document.createElement("option");
-            opt.value = site;
-            opt.textContent = site;
-            earthSelect.appendChild(opt);
-        });
+  <!-- Interactive Application Logic -->
+  <script>
+    // ==========================================
+    // MISSION DATA STORE (MARS & MOON ANALOGS)
+    // ==========================================
+    const MISSIONS = {
+      mars: {
+        id: 'mars',
+        accent: '#D9532F',
+        accentSoft: '#FDF1ED',
+        badge: 'MARS TERRESTRIAL ANALOG',
+        coords: '31.15° N, 5.75° W · ANTI-ATLAS, MOROCCO',
+        headline: "Jebel Saghro: Earth's Equatorial Mars Twin",
+        summary: "Astronauts never launch without realistic Earth rehearsals. Located in south-east Morocco, Jebel Saghro replicates Martian equatorial summer daytime temperatures, hard high-thermal-inertia bedrock, intense UV flux, and biosignature-trapping minerals.",
+        kpis: [
+          { label: 'DAYTIME TEMP MATCH', value: '19–22°C', sub: 'vs Mars 20°C Equator' },
+          { label: 'BIOSIGNATURE ROCKS', value: '3 Types', sub: 'Silica · Clays · Carbonates' },
+          { label: 'THERMAL INERTIA', value: 'High', sub: 'Exposed Bedrock + Thin Dust' }
+        ],
+        legend: [
+          { color: '#C85A32', label: 'Basaltic / Volcanic Peaks' },
+          { color: '#E09F5A', label: 'Thin Dust Veneer (<2 cm)' },
+          { color: '#3B82F6', label: 'Silica / Clay / Carbonate Veins' },
+          { color: '#9A3412', label: 'Mars Equatorial Crater Rim' }
+        ],
+        hotspots: [
+          {
+            id: 'temp',
+            shortTitle: 'Equatorial Temp',
+            icon: 'fa-temperature-half',
+            pinX: 250,
+            pinY: 165,
+            title: 'Equatorial Temperature Match',
+            tag: 'THERMAL ENVIRONMENT',
+            analogStat: '19°C – 22°C Day / 11°C – 14°C Night',
+            targetStat: 'Mars Equator: 20°C Summer Day / -73°C Night',
+            description: 'While Mars averages -60°C to -63°C globally (and plunges to -125°C to -153°C at the poles), future human missions target the Martian equator where summer days reach 20°C. Jebel Saghro mirrors this exact daytime thermal window safely for field crews.',
+            table: [
+              { zone: 'Equatorial Summer Day', planet: 'Up to 20°C', earth: '19°C to 22°C (Match)' },
+              { zone: 'Equatorial Night', planet: '-73°C', earth: '11°C to 14°C' },
+              { zone: 'Global Avg / Poles', planet: '-60°C / -153°C', earth: 'Crew-Safe Field Window' }
+            ]
+          },
+          {
+            id: 'minerals',
+            shortTitle: 'Biosignature Rocks',
+            icon: 'fa-gem',
+            pinX: 465,
+            pinY: 285,
+            title: 'Biosignature-Preserving Minerals',
+            tag: 'ASTROBIOLOGY & GEOLOGY',
+            analogStat: 'Abundant Silica, Clays & Carbonates',
+            targetStat: 'Traps Ancient Microbial Traces on Mars',
+            description: 'To discover if life ever existed on Mars, scientists search for mineral matrices that shield ancient organic traces from destruction. Jebel Saghro is rich in silica, clays, and carbonates—making it an ideal testbed for calibrating life-detection instruments.',
+            table: [
+              { zone: 'Silica', planet: 'Entombs microfossils', earth: 'Abundant in Saghro veins' },
+              { zone: 'Clays (Phyllosilicates)', planet: 'Binds organic molecules', earth: 'Weathered volcanic strata' },
+              { zone: 'Carbonates', planet: 'Records ancient water pH', earth: 'Exposed sedimentary beds' }
+            ]
+          },
+          {
+            id: 'surface',
+            shortTitle: 'Bedrock vs Sand',
+            icon: 'fa-layer-group',
+            pinX: 640,
+            pinY: 235,
+            title: 'High Thermal Inertia & Hard Bedrock',
+            tag: 'LANDING & ORBITAL SENSING',
+            analogStat: 'Hard Rocky Surface + Thin Dust Layer',
+            targetStat: 'Mimics Cratered Martian Regolith',
+            description: 'Unlike the Sahara Desert—which is covered in deep, loose sand that buries rocks—Jebel Saghro features exposed, hard bedrock with only a thin dust veneer. This high thermal inertia ensures safe spacecraft landing trials and allows orbital spectrometers to accurately read true rock mineralogy.',
+            table: [
+              { zone: 'Surface Mechanics', planet: 'Hard rocky cratered terrain', earth: 'Hard basaltic plateau' },
+              { zone: 'Dust Thickness', planet: 'Thin regolith over rock', earth: 'Thin veneer (unlike Sahara)' },
+              { zone: 'Orbital Detection', planet: 'Clear mineral spectra', earth: 'High thermal inertia match' }
+            ]
+          },
+          {
+            id: 'radiation',
+            shortTitle: 'UV & Altitude O₂',
+            icon: 'fa-sun',
+            pinX: 370,
+            pinY: 110,
+            title: 'Intense UV & Mountain Oxygen Gradient',
+            tag: 'ATMOSPHERIC & RADIATION PARALLEL',
+            analogStat: 'High UV Flux + Lower Peak Oxygen',
+            targetStat: 'Mars Thin Atmosphere (~1% Earth)',
+            description: 'Mars has an almost non-existent atmosphere and no magnetic shield, exposing its surface to intense cosmic and UV radiation. While Earth blocks cosmic ionizing rays, Jebel Saghro’s arid elevation delivers high-intensity UV light plus naturally decreasing oxygen levels at higher mountain altitudes.',
+            table: [
+              { zone: 'Radiation Regime', planet: 'Cosmic + Extreme UV', earth: 'High-intensity arid UV flux' },
+              { zone: 'Atmosphere / O₂', planet: 'Thin, near-zero oxygen', earth: 'Drops with mountain altitude' },
+              { zone: 'Hardware Testing', planet: 'UV polymer/sensor wear', earth: 'Realistic solar stress testing' }
+            ]
+          }
+        ]
+      },
 
-        Object.keys(moonSites).forEach(site => {
-            const opt = document.createElement("option");
-            opt.value = site;
-            opt.textContent = site;
-            moonSelect.appendChild(opt);
-        });
+      moon: {
+        id: 'moon',
+        accent: '#2563EB',
+        accentSoft: '#EFF6FF',
+        badge: 'LUNAR TERRESTRIAL ANALOG',
+        coords: '70.50° N, 108.00° E · SIBERIAN ARCTIC / POPIGAI',
+        headline: "Anabar Plateau: Earth's Lunar Highlands Twin",
+        summary: "Before astronauts walk on the Moon, they practice on Earth analogs replicating 1/6 gravity mobility, abrasive dust, extreme cold, and ancient impact geology. Siberia's Anabar Shield exposes rare lunar-like anorthosite crust right beside the 100-km Popigai impact crater.",
+        kpis: [
+          { label: 'CRUSTAL MATCH', value: 'Anorthosite', sub: 'Apollo Lunar Highlands Rock' },
+          { label: 'IMPACT ANALOG', value: '100 km', sub: 'Popigai Shock-Melt Crater' },
+          { label: 'LUNAR GRAVITY', value: '1/6 g', sub: '16.6% of Earth Gravity' }
+        ],
+        legend: [
+          { color: '#64748B', label: 'Ancient Anorthosite Shield' },
+          { color: '#38BDF8', label: 'Arctic Permafrost & Ice' },
+          { color: '#6366F1', label: 'Popigai Impact Melt & Breccia' },
+          { color: '#CBD5E1', label: 'Lunar Highland Crater Rim' }
+        ],
+        hotspots: [
+          {
+            id: 'anorthosite',
+            shortTitle: 'Anorthosite Crust',
+            icon: 'fa-mountain',
+            pinX: 260,
+            pinY: 185,
+            title: 'Ancient Lunar Highlands Anorthosite',
+            tag: 'CRUSTAL GEOCHEMISTRY',
+            analogStat: 'Exposed Archean Anorthosite Shield',
+            targetStat: 'Matches Bright Lunar Highlands (Apollo)',
+            description: 'The bright regions visible on the Moon are ancient highlands composed of calcium-rich plagioclase rock called anorthosite. The Anabar Plateau is one of the few accessible places on Earth with vast exposures of ancient anorthosite crust for astronaut sampling rehearsals.',
+            table: [
+              { zone: 'Primary Rock', planet: 'Lunar Highland Anorthosite', earth: 'Anabar Shield Anorthosite' },
+              { zone: 'Geological Age', planet: '>4.1 Billion Years', earth: 'Archean Crystalline Basement' },
+              { zone: 'Training Value', planet: 'Field rock identification', earth: 'Identical mineral texture' }
+            ]
+          },
+          {
+            id: 'popigai',
+            shortTitle: 'Popigai Crater',
+            icon: 'fa-meteor',
+            pinX: 520,
+            pinY: 255,
+            title: 'Popigai Impact Structure & Shock Melt',
+            tag: 'IMPACT GEOLOGY',
+            analogStat: '100-km Impact Crater & Shocked Rock',
+            targetStat: 'Replicates Lunar Basin Excavation',
+            description: 'Bordering the Anabar Plateau sits the 100-km-wide Popigai impact crater. Astronauts and robotic rovers can traverse real impact melt sheets, shatter cones, and breccia deposits—identical to the cratered geology of the Moon.',
+            table: [
+              { zone: 'Crater Scale', planet: 'Multi-ring impact basins', earth: '100 km Popigai Structure' },
+              { zone: 'Rock Alteration', planet: 'Impact melt & breccia', earth: 'Shock-metamorphosed gneiss' },
+              { zone: 'Rover Practice', planet: 'Crater rim navigation', earth: 'Steep ejecta & rim slopes' }
+            ]
+          },
+          {
+            id: 'hazards',
+            shortTitle: '1/6g & Dust Hazards',
+            icon: 'fa-weight-hanging',
+            pinX: 660,
+            pinY: 150,
+            title: '1/6 Gravity, Sharp Dust & Solar Storms',
+            tag: 'LUNAR SURFACE HAZARDS',
+            analogStat: 'Suit Seal, Mobility & Isolation Drills',
+            targetStat: '1/6g · Abrasive Regolith · Radiation',
+            description: 'Lunar missions face four critical hazards: sharp electrostatic lunar dust that damages spacesuit seals, extreme day-night temperature swings, unshielded solar radiation storms, and 1/6 Earth gravity requiring specialized mobility rehearsal.',
+            table: [
+              { zone: 'Gravity Pull', planet: '1/6 Earth Gravity (1.62 m/s²)', earth: 'Weighted/offloaded suit drills' },
+              { zone: 'Surface Dust', planet: 'Sharp, abrasive glass shards', earth: 'Crushed basaltic regolith tests' },
+              { zone: 'Radiation', planet: 'Unshielded solar storms', earth: 'Subsurface shelter protocols' }
+            ]
+          },
+          {
+            id: 'permafrost',
+            shortTitle: 'Arctic Permafrost',
+            icon: 'fa-snowflake',
+            pinX: 390,
+            pinY: 295,
+            title: 'Sub-Zero Isolation & Lunar South Pole',
+            tag: 'ARTEMIS MISSION READINESS',
+            analogStat: 'Siberian Arctic Permafrost & Extreme Cold',
+            targetStat: 'Mirrors Lunar South Pole Shadow Zones',
+            description: 'NASA’s Artemis missions target the Moon’s South Pole where water ice is trapped in permanently shadowed craters. Anabar’s sub-zero Siberian permafrost tests battery endurance, ice-drilling tools, and human crew psychology under extreme isolation.',
+            table: [
+              { zone: 'Thermal Stress', planet: 'Cryogenic shadowed craters', earth: 'Extreme sub-zero Arctic winter' },
+              { zone: 'Volatile Ice', planet: 'Regolith-bound water ice', earth: 'Deep permafrost core drilling' },
+              { zone: 'Crew Logistics', planet: 'Delayed rescue / isolation', earth: 'Remote Siberian field station' }
+            ]
+          }
+        ]
+      }
+    };
 
-        // Default Selections
-        earthSelect.value = "Hajar Mountains (Ophiolite / Anorthosite)";
-        moonSelect.value = "Moon: Lunar Highlands (Tycho Region)";
+    // ==========================================
+    // STATE VARIABLES
+    // ==========================================
+    let currentMission = 'mars';
+    let selectedHotspotId = 'temp';
+    let showTwinOverlay = true;
+    let showSaharaComparison = false;
+    let altitudeMeters = 2200; // Jebel Saghro peak ~2,712m
+    let roverPos = 32;
 
-        // Initialize Chart.js Radar Visualization
-        const ctx = document.getElementById("radarChart").getContext("2d");
-        const radarChart = new Chart(ctx, {
-            type: "radar",
-            data: {
-                labels: features,
-                datasets: [
-                    {
-                        label: "Earth Analog",
-                        data: [],
-                        backgroundColor: "rgba(0, 242, 254, 0.2)",
-                        borderColor: "#00f2fe",
-                        pointBackgroundColor: "#00f2fe",
-                        borderWidth: 2
-                    },
-                    {
-                        label: "Lunar Target",
-                        data: [],
-                        backgroundColor: "rgba(245, 158, 11, 0.2)",
-                        borderColor: "#f59e0b",
-                        pointBackgroundColor: "#f59e0b",
-                        borderDash: [5, 5],
-                        borderWidth: 2
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    r: {
-                        min: 0,
-                        max: 1,
-                        ticks: { display: false },
-                        grid: { color: "#1f2937" },
-                        angleLines: { color: "#374151" },
-                        pointLabels: {
-                            color: "#e5e7eb",
-                            font: { size: 11, weight: "bold" }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: { color: "#f3f4f6", font: { size: 12 } }
-                    }
-                }
-            }
-        });
+    // Pan & Zoom State
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
 
-        // Math Logic: Euclidean Similarity Calculation & UI Refresh
-        function updateComparison() {
-            const eName = earthSelect.value;
-            const mName = moonSelect.value;
+    // ==========================================
+    // INITIALIZATION & MISSION SWITCHING
+    // ==========================================
+    function switchMission(missionKey) {
+      currentMission = missionKey;
+      const m = MISSIONS[missionKey];
+      selectedHotspotId = m.hotspots[0].id;
 
-            const eData = earthSites[eName];
-            const mData = moonSites[mName];
+      // Update Header Styling
+      const brandIcon = document.getElementById('brand-icon');
+      const headerKicker = document.getElementById('header-kicker');
+      const btnMars = document.getElementById('btn-mission-mars');
+      const btnMoon = document.getElementById('btn-mission-moon');
+      const splitIcon = document.getElementById('split-icon');
 
-            let sumSq = 0;
-            for (let i = 0; i < eData.norm.length; i++) {
-                sumSq += Math.pow(eData.norm[i] - mData.norm[i], 2);
-            }
-            const distance = Math.sqrt(sumSq);
-            const maxDist = Math.sqrt(eData.norm.length);
-            const similarity = ((1 - (distance / maxDist)) * 100).toFixed(1);
+      if (missionKey === 'mars') {
+        brandIcon.className = 'w-10 h-10 rounded-xl bg-mars text-white flex items-center justify-center shadow-sm transition-colors duration-300';
+        headerKicker.className = 'font-mono text-[11px] font-semibold uppercase tracking-widest text-mars';
+        btnMars.className = 'tab-pill px-3.5 py-2 rounded-xl font-mono text-xs font-semibold flex items-center gap-2 bg-mars text-white shadow-sm';
+        btnMoon.className = 'tab-pill px-3.5 py-2 rounded-xl font-mono text-xs font-semibold flex items-center gap-2 text-muted hover:text-ink';
+        splitIcon.className = 'fa-solid fa-layer-group text-mars';
+      } else {
+        brandIcon.className = 'w-10 h-10 rounded-xl bg-lunar text-white flex items-center justify-center shadow-sm transition-colors duration-300';
+        headerKicker.className = 'font-mono text-[11px] font-semibold uppercase tracking-widest text-lunar';
+        btnMoon.className = 'tab-pill px-3.5 py-2 rounded-xl font-mono text-xs font-semibold flex items-center gap-2 bg-lunar text-white shadow-sm';
+        btnMars.className = 'tab-pill px-3.5 py-2 rounded-xl font-mono text-xs font-semibold flex items-center gap-2 text-muted hover:text-ink';
+        splitIcon.className = 'fa-solid fa-layer-group text-lunar';
+      }
 
-            document.getElementById("similarityScore").textContent = similarity + "%";
-            document.getElementById("missionInsight").innerHTML = 
-                `<strong>Earth Testbed Value:</strong> ${eData.note}<br><br>` +
-                `<strong>Lunar Objective:</strong> ${mData.note}`;
+      // Update Banner & KPIs
+      const badge = document.getElementById('mission-badge');
+      badge.textContent = m.badge;
+      badge.style.backgroundColor = m.accentSoft;
+      badge.style.color = m.accent;
 
-            radarChart.data.datasets[0].label = eName;
-            radarChart.data.datasets[0].data = eData.norm;
-            radarChart.data.datasets[1].label = mName;
-            radarChart.data.datasets[1].data = mData.norm;
-            radarChart.update();
+      document.getElementById('mission-coords').textContent = m.coords;
+      document.getElementById('mission-headline').textContent = m.headline;
+      document.getElementById('mission-summary').textContent = m.summary;
+
+      const kpiStrip = document.getElementById('kpi-strip');
+      kpiStrip.innerHTML = m.kpis.map(k => `
+        <div class="bg-stone-50 border border-stoneBorder rounded-xl px-3.5 py-2.5">
+          <div class="font-mono text-[10px] text-muted uppercase">${k.label}</div>
+          <div class="font-mono text-base sm:text-lg font-bold mt-0.5" style="color:${m.accent}">${k.value}</div>
+          <div class="text-[11px] text-muted truncate">${k.sub}</div>
+        </div>
+      `).join('');
+
+      // Update Legend
+      document.getElementById('diagram-legend').innerHTML = m.legend.map(item => `
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-xs inline-block" style="background:${item.color}"></span>
+          <span class="text-[11px] text-ink">${item.label}</span>
+        </div>
+      `).join('');
+
+      resetView();
+      renderDiagram();
+      renderHotspotButtons();
+      renderHotspotDetail();
+      renderSandbox();
+      updateRoverPosition(roverPos);
+    }
+
+    // ==========================================
+    // CARTOONIC-SCIENTIFIC SVG GENERATOR
+    // ==========================================
+    function renderDiagram() {
+      const layer = document.getElementById('pan-zoom-layer');
+      const m = MISSIONS[currentMission];
+
+      if (currentMission === 'mars') {
+        layer.innerHTML = `
+          <svg id="terrain-svg" viewBox="0 0 820 460" class="w-full h-full">
+            <defs>
+              <!-- Sky Gradients -->
+              <linearGradient id="saghroSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#E0F2FE" />
+                <stop offset="100%" stop-color="#FEF3C7" />
+              </linearGradient>
+              <linearGradient id="marsSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#9A3412" />
+                <stop offset="100%" stop-color="#FDBA74" />
+              </linearGradient>
+              <!-- Rock Strata Pattern -->
+              <pattern id="strataPattern" width="40" height="20" patternUnits="userSpaceOnUse">
+                <path d="M0 10 Q 10 6, 20 10 T 40 10" fill="none" stroke="#7C2D12" stroke-width="1.2" opacity="0.25"/>
+              </pattern>
+            </defs>
+
+            <!-- Background Sky: Left = Jebel Saghro (Earth), Right = Mars Twin Overlay -->
+            <rect x="0" y="0" width="${showTwinOverlay ? 450 : 820}" height="320" fill="url(#saghroSky)" />
+            ${showTwinOverlay ? `<rect x="450" y="0" width="370" height="320" fill="url(#marsSky)" />` : ''}
+
+            <!-- Sun & High UV Rays (Left: Saghro) -->
+            <circle cx="110" cy="68" r="28" fill="#FBBF24" opacity="0.9" />
+            <g stroke="#F59E0B" stroke-width="2" stroke-dasharray="5,5" opacity="0.75">
+              <line x1="145" y1="85" x2="240" y2="155" />
+              <line x1="130" y1="102" x2="195" y2="185" />
+              <line x1="152" y1="68" x2="345" y2="112" />
+            </g>
+            <text x="65" y="116" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#B45309">HIGH UV FLUX (22°C)</text>
+
+            <!-- Mars Twin Sky Label & Phobos Moon (Right) -->
+            ${showTwinOverlay ? `
+              <circle cx="730" cy="65" r="14" fill="#FED7AA" opacity="0.8" />
+              <text x="595" y="42" font-family="IBM Plex Mono" font-size="11" font-weight="700" fill="#FFF7ED">MARS EQUATORIAL TWIN (20°C)</text>
+              <text x="595" y="58" font-family="IBM Plex Mono" font-size="10" fill="#FFEDD5">Thin CO₂ Atmosphere · Cosmic/UV Rays</text>
+            ` : ''}
+
+            <!-- Distant Anti-Atlas Mesas & Volcanic Peaks (Jebel Saghro) -->
+            <path d="M0 245 L75 165 L135 170 L185 120 L255 125 L315 175 L395 140 L450 185 L450 280 L0 280 Z" fill="#D97757" />
+            <path d="M185 120 L255 125 L230 185 L165 185 Z" fill="#B84A27" opacity="0.55" />
+
+            <!-- Mars Crater Rim Silhouette (Right when Twin Overlay ON) -->
+            ${showTwinOverlay ? `
+              <path d="M450 185 L520 150 L585 195 L675 195 L745 145 L820 175 L820 280 L450 280 Z" fill="#9A3412" />
+              <path d="M520 150 L585 195 L675 195 L745 145 L725 215 L540 215 Z" fill="#7C2D12" opacity="0.6" />
+              <text x="572" y="182" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#FED7AA">MARTIAN CRATER RIM</text>
+            ` : `
+              <path d="M450 185 L535 145 L625 180 L720 155 L820 190 L820 280 L450 280 Z" fill="#D97757" />
+            `}
+
+            <!-- Subsurface Geological Cross-Section Block -->
+            <rect x="0" y="255" width="820" height="205" fill="#78350F" />
+            <rect x="0" y="255" width="820" height="205" fill="url(#strataPattern)" />
+
+            <!-- Deep Bedrock Layer -->
+            <path d="M0 325 Q 210 305, 420 330 T 820 315 L 820 460 L 0 460 Z" fill="#451A03" />
+
+            <!-- Biosignature-Preserving Mineral Veins (Silica, Clays, Carbonates) -->
+            <path d="M140 310 Q 260 285, 380 315 T 560 295" fill="none" stroke="#3B82F6" stroke-width="6" stroke-linecap="round" opacity="0.85" />
+            <path d="M210 345 Q 340 325, 490 340 T 690 320" fill="none" stroke="#38BDF8" stroke-width="4" stroke-dasharray="10,6" />
+            <text x="155" y="365" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#93C5FD">SILICA · CLAYS · CARBONATES (BIOSIGNATURE TRAPS)</text>
+
+            <!-- Surface Crust: Hard Basaltic Bedrock vs Optional Loose Sahara Sand Overlay -->
+            ${showSaharaComparison ? `
+              <!-- Loose Sahara Sand Dune Overlay (Educational Contrast) -->
+              <path d="M0 255 Q 140 205, 290 250 T 580 235 T 820 255 L 820 285 L 0 285 Z" fill="#FBBF24" />
+              <text x="240" y="242" font-family="IBM Plex Mono" font-size="11" font-weight="700" fill="#78350F">⚠ SAHARA LOOSE SAND (LOW THERMAL INERTIA · BURIES ROCKS)</text>
+            ` : `
+              <!-- Jebel Saghro Hard Rocky Surface + Thin Dust Veneer (<2cm) -->
+              <path d="M0 255 L820 255 L820 264 L0 264 Z" fill="#F59E0B" />
+              <!-- Scattered Surface Boulders -->
+              <polygon points="120,255 132,243 148,246 154,255" fill="#57534E" />
+              <polygon points="310,255 325,240 342,245 348,255" fill="#44403C" />
+              <polygon points="610,255 624,241 644,244 652,255" fill="#7C2D12" />
+              <text x="35" y="282" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#FDE68A">HARD BASALT BEDROCK + THIN DUST (HIGH THERMAL INERTIA)</text>
+            `}
+
+            <!-- Twin Divider Line -->
+            ${showTwinOverlay ? `
+              <line x1="450" y1="0" x2="450" y2="460" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="6,6" />
+              <rect x="372" y="14" width="156" height="24" rx="12" fill="#1C1917" />
+              <text x="450" y="30" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#FAF8F5">EARTH ↔ MARS TWIN</text>
+            ` : ''}
+
+            <!-- Interactive Rover Sprite (Moves along surface via slider) -->
+            <g id="rover-sprite" transform="translate(${60 + (roverPos / 100) * 680}, 228)">
+              <!-- Laser Scan Beam -->
+              <polygon points="18,16 6,27 30,27" fill="#10B981" opacity="0.45" />
+              <!-- Rover Body -->
+              <rect x="4" y="8" width="28" height="11" rx="3" fill="#F8FAFC" stroke="#1C1917" stroke-width="1.5" />
+              <!-- Mast & Camera -->
+              <line x1="24" y1="8" x2="24" y2="0" stroke="#1C1917" stroke-width="2" />
+              <rect x="20" y="-3" width="9" height="5" rx="1" fill="#D9532F" />
+              <!-- Wheels -->
+              <circle cx="8" cy="22" r="4.5" fill="#1C1917" />
+              <circle cx="18" cy="22" r="4.5" fill="#1C1917" />
+              <circle cx="28" cy="22" r="4.5" fill="#1C1917" />
+            </g>
+
+            <!-- Interactive Hotspot Pins -->
+            ${m.hotspots.map((h, idx) => renderPinSVG(h, idx + 1, m.accent)).join('')}
+          </svg>
+        `;
+      } else {
+        // MOON <-> ANABAR PLATEAU DIAGRAM
+        layer.innerHTML = `
+          <svg id="terrain-svg" viewBox="0 0 820 460" class="w-full h-full">
+            <defs>
+              <linearGradient id="anabarSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#DBEAFE" />
+                <stop offset="100%" stop-color="#F1F5F9" />
+              </linearGradient>
+              <linearGradient id="lunarSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#0F172A" />
+                <stop offset="100%" stop-color="#1E293B" />
+              </linearGradient>
+            </defs>
+
+            <!-- Background Sky: Left = Anabar Plateau (Siberian Arctic), Right = Lunar Highlands -->
+            <rect x="0" y="0" width="${showTwinOverlay ? 450 : 820}" height="320" fill="url(#anabarSky)" />
+            ${showTwinOverlay ? `<rect x="450" y="0" width="370" height="320" fill="url(#lunarSky)" />` : ''}
+
+            <!-- Left Sky: Arctic Sub-Zero Label -->
+            <text x="28" y="42" font-family="IBM Plex Mono" font-size="11" font-weight="700" fill="#1E3A8A">ANABAR SHIELD · SIBERIAN ARCTIC</text>
+            <text x="28" y="58" font-family="IBM Plex Mono" font-size="10" fill="#475569">Sub-Zero Permafrost &amp; Archean Crust</text>
+
+            <!-- Right Sky: Lunar Stars, Earthrise & 1/6g Badge -->
+            ${showTwinOverlay ? `
+              <circle cx="745" cy="58" r="18" fill="#2563EB" />
+              <path d="M735 52 Q 745 46, 755 55 T 742 68 Z" fill="#34D399" opacity="0.85" />
+              <circle cx="520" cy="45" r="1.5" fill="#FFF" />
+              <circle cx="610" cy="75" r="1.5" fill="#FFF" />
+              <circle cx="680" cy="35" r="2" fill="#FFF" />
+              <text x="475" y="42" font-family="IBM Plex Mono" font-size="11" font-weight="700" fill="#F8FAFC">LUNAR HIGHLANDS TWIN (1/6 g)</text>
+              <text x="475" y="58" font-family="IBM Plex Mono" font-size="10" fill="#94A3B8">Vacuum · Solar Radiation · Abrasive Dust</text>
+            ` : ''}
+
+            <!-- Anabar Ancient Anorthosite Highlands (Left) -->
+            <path d="M0 230 L65 160 L165 155 L245 185 L325 145 L415 170 L450 210 L450 280 L0 280 Z" fill="#94A3B8" />
+            <path d="M65 160 L165 155 L140 215 L45 215 Z" fill="#CBD5E1" opacity="0.7" />
+
+            <!-- Popigai Impact Crater & Lunar Crater Rim (Center-Right) -->
+            <path d="M410 210 L475 165 L545 225 L635 225 L705 160 L775 185 L820 165 L820 280 L410 280 Z" fill="#64748B" />
+            <path d="M475 165 L545 225 L635 225 L705 160 L680 242 L505 242 Z" fill="#334155" opacity="0.65" />
+            <text x="525" y="205" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#E2E8F0">POPIGAI / LUNAR CRATER BASIN</text>
+
+            <!-- Subsurface Geological Cross-Section -->
+            <rect x="0" y="255" width="820" height="205" fill="#334155" />
+            <!-- Deep Anorthosite Basement -->
+            <path d="M0 315 Q 240 295, 460 320 T 820 305 L 820 460 L 0 460 Z" fill="#1E293B" />
+
+            <!-- Permafrost Ice & Impact Melt Lenses -->
+            <path d="M40 278 Q 180 270, 340 282" fill="none" stroke="#38BDF8" stroke-width="6" stroke-linecap="round" />
+            <text x="42" y="302" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#7DD3FC">PERMAFROST ICE (SOUTH POLE PROXY)</text>
+
+            <path d="M480 275 Q 590 298, 700 272" fill="none" stroke="#818CF8" stroke-width="6" stroke-linecap="round" />
+            <text x="485" y="310" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#C7D2FE">SHOCK IMPACT MELT &amp; BRECCIA</text>
+
+            <!-- Top Regolith / Anorthosite Surface Strip -->
+            <rect x="0" y="255" width="820" height="8" fill="#CBD5E1" />
+            <text x="35" y="355" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#E2E8F0">ARCHEAN ANORTHOSITE CRUST (CALCIUM-RICH PLAGIOCLASE)</text>
+
+            <!-- Twin Divider Line -->
+            ${showTwinOverlay ? `
+              <line x1="450" y1="0" x2="450" y2="460" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="6,6" />
+              <rect x="372" y="14" width="156" height="24" rx="12" fill="#1E3A8A" />
+              <text x="450" y="30" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" fill="#FFFFFF">EARTH ↔ MOON TWIN</text>
+            ` : ''}
+
+            <!-- Interactive Lunar Rover Sprite -->
+            <g id="rover-sprite" transform="translate(${60 + (roverPos / 100) * 680}, 228)">
+              <polygon points="18,16 6,27 30,27" fill="#38BDF8" opacity="0.45" />
+              <rect x="4" y="9" width="28" height="10" rx="3" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5" />
+              <line x1="22" y1="9" x2="22" y2="0" stroke="#0F172A" stroke-width="2" />
+              <circle cx="22" cy="-2" r="3.5" fill="#2563EB" />
+              <circle cx="8" cy="22" r="4.5" fill="#0F172A" />
+              <circle cx="18" cy="22" r="4.5" fill="#0F172A" />
+              <circle cx="28" cy="22" r="4.5" fill="#0F172A" />
+            </g>
+
+            <!-- Interactive Hotspot Pins -->
+            ${m.hotspots.map((h, idx) => renderPinSVG(h, idx + 1, m.accent)).join('')}
+          </svg>
+        `;
+      }
+    }
+
+    function renderPinSVG(hotspot, num, accentColor) {
+      const isSelected = hotspot.id === selectedHotspotId;
+      return `
+        <g class="hotspot-group" onclick="selectHotspot('${hotspot.id}')" transform="translate(${hotspot.pinX}, ${hotspot.pinY})">
+          <circle cx="0" cy="0" r="${isSelected ? 18 : 14}" fill="${accentColor}" class="hotspot-ring" />
+          <circle cx="0" cy="0" r="${isSelected ? 15 : 12}" fill="${isSelected ? '#1C1917' : accentColor}" stroke="#FFFFFF" stroke-width="2.5" />
+          <text x="0" y="4" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="700" fill="#FFFFFF">${num}</text>
+          <rect x="-46" y="18" width="92" height="18" rx="6" fill="#1C1917" opacity="0.9" />
+          <text x="0" y="30" text-anchor="middle" font-family="Plus Jakarta Sans" font-size="9.5" font-weight="600" fill="#FFFFFF">${hotspot.shortTitle}</text>
+        </g>
+      `;
+    }
+
+    // ==========================================
+    // RIGHT PANEL: HOTSPOT DETAILS & SANDBOX
+    // ==========================================
+    function renderHotspotButtons() {
+      const m = MISSIONS[currentMission];
+      const container = document.getElementById('hotspot-buttons');
+      container.innerHTML = m.hotspots.map((h, idx) => {
+        const active = h.id === selectedHotspotId;
+        return `
+          <button onclick="selectHotspot('${h.id}')"
+            class="px-3 py-2.5 rounded-xl border text-left transition flex items-center gap-2.5 ${
+              active
+                ? 'bg-ink text-white border-ink shadow-xs'
+                : 'bg-stone-50 hover:bg-stone-100 text-ink border-stoneBorder'
+            }">
+            <span class="w-5 h-5 rounded-full font-mono text-[11px] font-bold flex items-center justify-center shrink-0"
+              style="background:${active ? m.accent : '#E7E1D8'}; color:${active ? '#FFF' : '#1C1917'}">
+              ${idx + 1}
+            </span>
+            <span class="text-xs font-semibold truncate">${h.shortTitle}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectHotspot(id) {
+      selectedHotspotId = id;
+      renderDiagram();
+      renderHotspotButtons();
+      renderHotspotDetail();
+    }
+
+    function renderHotspotDetail() {
+      const m = MISSIONS[currentMission];
+      const h = m.hotspots.find(item => item.id === selectedHotspotId) || m.hotspots[0];
+      const card = document.getElementById('hotspot-detail-card');
+
+      card.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <span class="font-mono text-[11px] font-semibold uppercase tracking-wider" style="color:${m.accent}">${h.tag}</span>
+            <h3 class="font-serif text-xl font-bold text-ink mt-0.5">${h.title}</h3>
+          </div>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:${m.accentSoft}; color:${m.accent}">
+            <i class="fa-solid ${h.icon} text-lg"></i>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="p-3 rounded-xl bg-stone-50 border border-stoneBorder">
+            <div class="font-mono text-[10px] text-muted uppercase">Earth Analog Site</div>
+            <div class="text-xs font-bold text-ink mt-0.5">${h.analogStat}</div>
+          </div>
+          <div class="p-3 rounded-xl border" style="background:${m.accentSoft}; border-color:${m.accent}33">
+            <div class="font-mono text-[10px] uppercase" style="color:${m.accent}">Planetary Target</div>
+            <div class="text-xs font-bold text-ink mt-0.5">${h.targetStat}</div>
+          </div>
+        </div>
+
+        <p class="text-sm text-muted leading-relaxed">${h.description}</p>
+
+        <div class="overflow-hidden rounded-xl border border-stoneBorder">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-stone-100 text-ink font-mono text-[10px] uppercase">
+                <th class="py-2 px-3">Parameter</th>
+                <th class="py-2 px-3">${currentMission === 'mars' ? 'Mars' : 'Moon'}</th>
+                <th class="py-2 px-3">${currentMission === 'mars' ? 'Jebel Saghro' : 'Anabar'}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-stoneBorder">
+              ${h.table.map(row => `
+                <tr>
+                  <td class="py-2 px-3 font-semibold text-ink">${row.zone}</td>
+                  <td class="py-2 px-3 text-muted font-mono text-[11px]">${row.planet}</td>
+                  <td class="py-2 px-3 font-medium text-ink">${row.earth}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // ==========================================
+    // INTERACTIVE SANDBOX CONTROLS (RIGHT BOTTOM)
+    // ==========================================
+    function renderSandbox() {
+      const box = document.getElementById('sandbox-card');
+
+      if (currentMission === 'mars') {
+        const o2Percent = Math.max(72, Math.round(100 - (altitudeMeters / 2712) * 26));
+        const uvIndex = Math.min(13, Math.round(7 + (altitudeMeters / 2712) * 5));
+
+        box.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-[11px] font-semibold uppercase text-mars">Interactive Mars Analog Lab</span>
+            <span class="font-mono text-[11px] text-muted">JEBEL SAGHRO</span>
+          </div>
+
+          <!-- Toggle: Bedrock vs Loose Sahara Sand -->
+          <div class="p-3 rounded-xl bg-stone-50 border border-stoneBorder flex items-center justify-between gap-3">
+            <div>
+              <div class="text-xs font-bold text-ink">Compare vs. Sahara Loose Sand</div>
+              <div class="text-[11px] text-muted">See why hard bedrock beats deep sand for orbital sensors</div>
+            </div>
+            <button onclick="toggleSaharaOverlay()"
+              class="px-3 py-1.5 rounded-lg font-mono text-xs font-semibold transition ${
+                showSaharaComparison ? 'bg-amber-500 text-white' : 'bg-white border border-stoneBorder text-ink hover:bg-stone-100'
+              }">
+              ${showSaharaComparison ? 'Sahara Overlay: ON' : 'Test Loose Sand'}
+            </button>
+          </div>
+
+          <!-- Mountain Altitude UV & Oxygen Simulator -->
+          <div class="p-3 rounded-xl bg-stone-50 border border-stoneBorder space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-ink">Mountain Elevation: <span class="font-mono text-mars">${altitudeMeters} m</span></span>
+              <span class="font-mono text-[11px] text-muted">Max Peak: 2,712 m</span>
+            </div>
+            <input type="range" min="800" max="2712" value="${altitudeMeters}" oninput="updateAltitude(this.value)" class="w-full" />
+            <div class="grid grid-cols-2 gap-2 pt-1 font-mono text-[11px]">
+              <div class="bg-white px-2.5 py-1.5 rounded-lg border border-stoneBorder">
+                UV Intensity: <strong class="text-mars">Index ${uvIndex} (High)</strong>
+              </div>
+              <div class="bg-white px-2.5 py-1.5 rounded-lg border border-stoneBorder">
+                Available O₂: <strong class="text-ink">${o2Percent}% Sea Level</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        // Moon 1/6g & Lunar Hazard Sandbox
+        box.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-[11px] font-semibold uppercase text-lunar">Interactive Lunar Physics Lab</span>
+            <span class="font-mono text-[11px] text-muted">1/6 GRAVITY</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-lunarSoft/70 border border-lunar/20 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs font-bold text-ink">1/6 g Astronaut Jump &amp; Mass Simulator</div>
+                <div class="text-[11px] text-muted">Test spacesuit weight on Earth vs. the Moon</div>
+              </div>
+              <button onclick="triggerLunarJump()" class="px-3 py-1.5 rounded-lg bg-lunar text-white font-mono text-xs font-semibold hover:bg-blue-700 transition">
+                <i class="fa-solid fa-person-running mr-1"></i> Simulate 1/6g Hop
+              </button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-center font-mono">
+              <div class="bg-white p-2 rounded-lg border border-stoneBorder">
+                <div class="text-[10px] text-muted">EARTH SUIT</div>
+                <div class="text-xs font-bold text-ink mt-0.5">180 kg</div>
+              </div>
+              <div class="bg-white p-2 rounded-lg border border-stoneBorder">
+                <div class="text-[10px] text-muted">MOON FELT</div>
+                <div class="text-xs font-bold text-lunar mt-0.5">30 kg (1/6g)</div>
+              </div>
+              <div class="bg-white p-2 rounded-lg border border-stoneBorder">
+                <div class="text-[10px] text-muted">HOP HEIGHT</div>
+                <div id="jump-height-val" class="text-xs font-bold text-emerald-700 mt-0.5">~2.4 m</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function toggleSaharaOverlay() {
+      showSaharaComparison = !showSaharaComparison;
+      renderDiagram();
+      renderSandbox();
+      updateRoverPosition(roverPos);
+    }
+
+    function updateAltitude(val) {
+      altitudeMeters = parseInt(val, 10);
+      renderSandbox();
+    }
+
+    function triggerLunarJump() {
+      const rover = document.getElementById('rover-sprite');
+      if (!rover) return;
+      const baseX = 60 + (roverPos / 100) * 680;
+      rover.style.transition = 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
+      rover.setAttribute('transform', `translate(${baseX}, 172)`);
+      setTimeout(() => {
+        rover.setAttribute('transform', `translate(${baseX}, 228)`);
+      }, 550);
+    }
+
+    // ==========================================
+    // ROVER & SPECTROMETER SLIDER LOGIC
+    // ==========================================
+    function updateRoverPosition(val) {
+      roverPos = parseInt(val, 10);
+      const rover = document.getElementById('rover-sprite');
+      if (rover) {
+        const x = 60 + (roverPos / 100) * 680;
+        rover.setAttribute('transform', `translate(${x}, 228)`);
+      }
+
+      const readout = document.getElementById('telemetry-readout');
+      const badge = document.getElementById('rover-zone-badge');
+      const mineral = document.getElementById('spec-mineral');
+      const surface = document.getElementById('spec-surface');
+      const status = document.getElementById('spec-status');
+
+      if (currentMission === 'mars') {
+        if (showSaharaComparison) {
+          readout.textContent = `ROVER SCAN: ${(roverPos / 10).toFixed(1)} km · LOOSE SAND WARNING`;
+          badge.className = 'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-amber-100 text-amber-800';
+          badge.textContent = 'LOW THERMAL INERTIA · BURIED BEDROCK';
+          mineral.textContent = 'Masked by Quartz Sand';
+          surface.textContent = 'Deep Loose Dunes (Wheel Slip Risk)';
+          status.className = 'text-xs font-bold text-amber-700 mt-0.5';
+          status.textContent = 'Orbital Spectrometer Obscured';
+        } else if (roverPos < 45) {
+          readout.textContent = `ROVER SCAN: ${(roverPos / 10).toFixed(1)} km · JEBEL SAGHRO`;
+          badge.className = 'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-emerald-100 text-emerald-800';
+          badge.textContent = 'SAFE LANDING ZONE · HIGH THERMAL INERTIA';
+          mineral.textContent = 'Silica + Smectite Clays + Carbonates';
+          surface.textContent = 'Hard Basalt · Thin Dust (<2 cm)';
+          status.className = 'text-xs font-bold text-emerald-700 mt-0.5';
+          status.textContent = 'Biosignature Matrix Verified';
+        } else {
+          readout.textContent = `ROVER SCAN: ${(roverPos / 10).toFixed(1)} km · MARS EQUATOR TWIN`;
+          badge.className = 'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-orange-100 text-orange-800';
+          badge.textContent = 'MARS EQUATORIAL CRATER REGOLITH';
+          mineral.textContent = 'Iron Oxide + Phyllosilicate Clays';
+          surface.textContent = 'Rocky Crater Floor · High Thermal Inertia';
+          status.className = 'text-xs font-bold text-mars mt-0.5';
+          status.textContent = '94% Structural & Thermal Match';
         }
+      } else {
+        if (roverPos < 48) {
+          readout.textContent = `ROVER SCAN: ${(roverPos / 10).toFixed(1)} km · ANABAR SHIELD`;
+          badge.className = 'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-blue-100 text-blue-800';
+          badge.textContent = 'ANORTHOSITE HIGHLANDS CRUST';
+          mineral.textContent = 'Calcium-Rich Plagioclase (Anorthosite)';
+          surface.textContent = 'Permafrost Bedrock · Sub-Zero Arctic';
+          status.className = 'text-xs font-bold text-lunar mt-0.5';
+          status.textContent = 'Matches Apollo Highlands Samples';
+        } else {
+          readout.textContent = `ROVER SCAN: ${(roverPos / 10).toFixed(1)} km · POPIGAI / LUNAR RIM`;
+          badge.className = 'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-indigo-100 text-indigo-800';
+          badge.textContent = 'IMPACT MELT & CRATER RIM ZONE';
+          mineral.textContent = 'Shocked Breccia & Impact Glass';
+          surface.textContent = 'Steep Crater Slope · 1/6g Mobility Test';
+          status.className = 'text-xs font-bold text-indigo-700 mt-0.5';
+          status.textContent = 'Crater Sampling Protocol Active';
+        }
+      }
+    }
 
-        // Run on page load
-        updateComparison();
-    </script>
+    // ==========================================
+    // PAN & ZOOM INTERACTION HANDLERS
+    // ==========================================
+    function applyTransform() {
+      const layer = document.getElementById('pan-zoom-layer');
+      layer.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }
+
+    function adjustZoom(delta) {
+      scale = Math.min(2.2, Math.max(0.85, scale + delta));
+      applyTransform();
+    }
+
+    function resetView() {
+      scale = 1;
+      panX = 0;
+      panY = 0;
+      applyTransform();
+    }
+
+    function toggleSplitView() {
+      showTwinOverlay = !showTwinOverlay;
+      document.getElementById('split-label').textContent = showTwinOverlay ? 'Planet Twin Overlay: ON' : 'Planet Twin Overlay: OFF';
+      renderDiagram();
+    }
+
+    function toggleModal(id, show) {
+      const el = document.getElementById(id);
+      if (show) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    }
+
+    // Mouse & Touch Drag Events for Viewport
+    window.addEventListener('DOMContentLoaded', () => {
+      const viewport = document.getElementById('diagram-viewport');
+
+      viewport.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.hotspot-group')) return;
+        isDragging = true;
+        startX = e.clientX - panX;
+        startY = e.clientY - panY;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        panX = e.clientX - startX;
+        panY = e.clientY - startY;
+        applyTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
+      viewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.12 : -0.12;
+        adjustZoom(delta);
+      }, { passive: false });
+
+      // Touch support for mobile/tablet judges
+      viewport.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.hotspot-group') || e.touches.length !== 1) return;
+        isDragging = true;
+        startX = e.touches[0].clientX - panX;
+        startY = e.touches[0].clientY - panY;
+      }, { passive: true });
+
+      viewport.addEventListener('touchmove', (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        panX = e.touches[0].clientX - startX;
+        panY = e.touches[0].clientY - startY;
+        applyTransform();
+      }, { passive: true });
+
+      viewport.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+
+      // Boot up default mission
+      switchMission('mars');
+    });
+  </script>
 </body>
 </html>
+```
